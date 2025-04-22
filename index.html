@@ -946,8 +946,17 @@
                 // Tab navigation
                 this.elements.tabButtons.forEach(button => {
                     button.addEventListener('click', () => {
-                        this.elements.tabButtons.forEach(btn => btn.classList.remove('active', 'border-accent'));
-                        button.classList.add('active', 'border-accent');
+                        // Remove active state and set transparent border for all tabs
+                        this.elements.tabButtons.forEach(btn => {
+                            btn.classList.remove('active');
+                            btn.classList.remove('border-accent');
+                            btn.classList.add('border-transparent');
+                        });
+                        
+                        // Set active state and accent border for clicked tab
+                        button.classList.add('active');
+                        button.classList.remove('border-transparent');
+                        button.classList.add('border-accent');
                         
                         const tab = button.getAttribute('data-tab');
                         this.elements.tabContents.forEach(content => content.classList.remove('active'));
