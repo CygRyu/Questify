@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questify - Daily Quest System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        accent: '#9c7a4d',
+                        dark: {
+                            DEFAULT: '#181818',
+                            '50': '#2a2a2a',
+                            '100': '#222222',
+                            '200': '#1e1e1e',
+                            '300': '#1a1a1a',
+                            '400': '#181818',
+                            '500': '#161616',
+                            '600': '#141414',
+                            '700': '#121212',
+                            '800': '#101010',
+                            '900': '#0a0a0a',
+                        },
+                        light: {
+                            DEFAULT: '#e0d9cc',
+                            '50': '#f5f0e8',
+                            '100': '#e0d9cc',
+                            '200': '#ccc3b0',
+                            '300': '#b8ad94',
+                            '400': '#a49778',
+                            '500': '#8f825c',
+                            '600': '#7c7050',
+                            '700': '#695e44',
+                            '800': '#564c38',
+                            '900': '#433a2c',
+                        },
+                    },
+                    fontFamily: {
+                        serif: ['Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+                        medieval: ['Georgia', 'Garamond', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                    },
+                    boxShadow: {
+                        'inner-lg': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.2)',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #5D5CDE;
+            --accent: #9c7a4d;
+            --dark: #181818;
+            --light: #e0d9cc;
+            --danger: #b91c1c;
+            --success: #15803d;
+        }
+        
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background-color: var(--dark);
+            color: var(--light);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23433a2c' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-attachment: fixed;
+        }
+        
+        .cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        
+        .quest-card {
+            background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23433a2c' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6h-2c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-color: rgba(26, 26, 26, 0.95);
+            border: 1px solid #433a2c;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .quest-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+        }
+        
+        .quest-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(156, 122, 77, 0.1) 0%, rgba(156, 122, 77, 0) 70%);
+            pointer-events: none;
+        }
+        
+        .quest-card.new-quest {
+            animation: glow 2s ease-in-out;
+        }
+        
+        .quest-card.rerolled::after {
+            content: '🔄';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .quest-board {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%23433a2c' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-color: rgba(40, 30, 20, 0.8);
+            border: 2px solid #433a2c;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .stamina-heart {
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .stamina-heart.depleted {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+        
+        .stamina-heart.active {
+            color: #ef4444;
+            transform: scale(1.1);
+        }
+        
+        .scale-indicator {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .scale-indicator div {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #9c7a4d;
+            opacity: 0.4;
+        }
+        
+        .scale-indicator div.active {
+            opacity: 1;
+        }
+        
+        .hollow-ui {
+            filter: saturate(10%);
+            opacity: 0.8;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(10, 10, 10, 0.95);
+            color: #e0d9cc;
+            text-align: center;
+            border: 1px solid #433a2c;
+            padding: 5px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(156, 122, 77, 0.3); }
+            30% { box-shadow: 0 0 20px rgba(156, 122, 77, 0.7); }
+            100% { box-shadow: 0 0 5px rgba(156, 122, 77, 0.3); }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(26, 26, 26, 0.5);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #9c7a4d;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b38d5a;
+        }
+        
+        .activity-list-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* First-time tutorial overlay */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .tutorial-content {
+            background-color: #1a1a1a;
+            border: 2px solid #9c7a4d;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        /* Paper texture effect for various elements */
+        .paper-texture {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%23e0d9cc' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="py-4 px-4 sm:px-6 border-b border-accent/30 bg-dark-400 shadow-md">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 sm:mb-0">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%239c7a4d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z'/%3E%3Cpath d='M5 3v4'/%3E%3Cpath d='M19 17v4'/%3E%3Cpath d='M3 5h4'/%3E%3Cpath d='M17 19h4'/%3E%3C/svg%3E" alt="Questify Logo" class="h-10 w-10 mr-2">
+                <h1 class="text-2xl sm:text-3xl cinzel font-bold text-light">Questify</h1>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <div class="mr-4 flex items-center">
+                    <span id="stamina-info" class="text-sm mr-2">Stamina:</span>
+                    <div id="stamina-display" class="flex">
+                        <div class="stamina-heart active">❤️</div>
+                        <div class="stamina-heart active">❤️</div>
+                        <div class="stamina-heart active">❤️</div>
+                        <div class="stamina-heart active">❤️</div>
+                        <div class="stamina-heart active">❤️</div>
+                    </div>
+                </div>
+                
+                <button id="help-btn" class="bg-accent/20 hover:bg-accent/30 text-light border border-accent/50 px-2 py-1 rounded text-sm transition-colors">
+                    <i class="fas fa-question-circle mr-1"></i> Help
+                </button>
+            </div>
+        </div>
+        
+        <div class="container mx-auto mt-4">
+            <nav class="flex">
+                <button class="tab-btn active px-4 py-2 cinzel text-light hover:bg-accent/20 transition-colors rounded-t-lg border-b-2 border-accent" data-tab="quests">
+                    <i class="fas fa-scroll mr-1"></i> Quest Board
+                </button>
+                <button class="tab-btn px-4 py-2 cinzel text-light hover:bg-accent/20 transition-colors rounded-t-lg border-b-2 border-transparent" data-tab="activities">
+                    <i class="fas fa-list-check mr-1"></i> Activities
+                </button>
+                <button class="tab-btn px-4 py-2 cinzel text-light hover:bg-accent/20 transition-colors rounded-t-lg border-b-2 border-transparent" data-tab="stats">
+                    <i class="fas fa-chart-simple mr-1"></i> Stats
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 py-6">
+        <!-- Quest Board Tab -->
+        <div id="quests-tab" class="tab-content active">
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                    <h2 class="text-2xl cinzel font-semibold mb-2">Daily Quest Board</h2>
+                    <p class="text-light/70 italic mb-4">Complete quests to overcome choice paralysis and conquer procrastination</p>
+                    <div id="daily-progress" class="mb-2">
+                        <span class="text-sm text-light/80">Daily Progress: <span id="quests-completed-today">0</span>/<span id="quests-total-today">0</span> quests completed</span>
+                        <div class="w-48 h-2 bg-dark-900 rounded overflow-hidden">
+                            <div id="daily-progress-bar" class="h-full bg-accent" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex mt-4 sm:mt-0">
+                    <div class="mr-4">
+                        <label for="quest-count" class="block text-sm text-light/80 mb-1">Number of quests:</label>
+                        <select id="quest-count" class="bg-dark-500 text-light border border-accent/50 rounded py-1 px-2 text-base">
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <button id="generate-quests" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-4 py-2 rounded font-semibold transition-colors flex items-center">
+                            <i class="fas fa-dice mr-2"></i> Generate Quests
+                            <span id="generate-counter" class="ml-2 text-sm bg-dark-900/50 px-2 py-0.5 rounded">🔄 Left: 5</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="quest-warning" class="hidden mb-4 p-4 bg-amber-900/20 border border-amber-600/50 text-amber-200 rounded">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span id="warning-message">Only X activities available; duplicates may occur.</span>
+            </div>
+            
+            <div id="hollow-warning" class="hidden mb-4 p-4 bg-red-900/20 border border-red-600/50 text-red-200 rounded">
+                <i class="fas fa-skull mr-2"></i>
+                <span>You have become Hollow! Quest generation costs 2 Stamina. Complete 3 quests without deleting any to reverse Hollowing.</span>
+            </div>
+            
+            <div id="quest-board" class="p-6 quest-board rounded-lg">
+                <div id="empty-quest-prompt" class="text-center py-16">
+                    <i class="fas fa-scroll text-5xl text-light/30 mb-4"></i>
+                    <h3 class="text-xl cinzel mb-2">No Quests Available</h3>
+                    <p class="text-light/50 mb-6">Add activities and generate quests to begin your journey</p>
+                    <button id="empty-add-activity-btn" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-4 py-2 rounded font-semibold transition-colors">
+                        <i class="fas fa-plus mr-2"></i> Add Your First Activity
+                    </button>
+                </div>
+                
+                <div id="quest-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Quest cards will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activities Tab -->
+        <div id="activities-tab" class="tab-content">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl cinzel font-semibold mb-2">Manage Activities</h2>
+                    <p class="text-light/70 italic">Add and customize your activities to be used as quests</p>
+                </div>
+                
+                <button id="add-activity-btn" class="mt-4 sm:mt-0 bg-accent hover:bg-accent/80 text-light border border-accent/50 px-4 py-2 rounded font-semibold transition-colors">
+                    <i class="fas fa-plus mr-2"></i> Add New Activity
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Activity Form -->
+                <div id="activity-form-container" class="hidden bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <h3 class="text-xl cinzel font-semibold mb-4">
+                        <span id="form-title">Add New Activity</span>
+                    </h3>
+                    
+                    <form id="activity-form" class="space-y-4">
+                        <input type="hidden" id="activity-id" value="">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="activity-type" class="block text-sm text-light/80 mb-1">Type</label>
+                                <div class="relative">
+                                    <select id="activity-type" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base">
+                                        <option value="Read">Read</option>
+                                        <option value="Play">Play</option>
+                                        <option value="Watch">Watch</option>
+                                        <option value="Listen">Listen</option>
+                                        <option value="Practice">Practice</option>
+                                        <option value="Learn">Learn</option>
+                                        <option value="Work">Work</option>
+                                        <option value="Exercise">Exercise</option>
+                                        <option value="Cook">Cook</option>
+                                        <option value="Clean">Clean</option>
+                                        <option value="custom">Custom...</option>
+                                    </select>
+                                    <input type="text" id="custom-type" class="hidden w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base mt-2" placeholder="Enter custom type...">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="activity-object" class="block text-sm text-light/80 mb-1">Object</label>
+                                <div class="relative">
+                                    <select id="activity-object" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base">
+                                        <option value="Book">Book</option>
+                                        <option value="Manga">Manga</option>
+                                        <option value="Comic">Comic</option>
+                                        <option value="Video Game">Video Game</option>
+                                        <option value="Board Game">Board Game</option>
+                                        <option value="Movie">Movie</option>
+                                        <option value="TV Show">TV Show</option>
+                                        <option value="Anime">Anime</option>
+                                        <option value="Podcast">Podcast</option>
+                                        <option value="Music">Music</option>
+                                        <option value="Instrument">Instrument</option>
+                                        <option value="Language">Language</option>
+                                        <option value="Project">Project</option>
+                                        <option value="Recipe">Recipe</option>
+                                        <option value="Room">Room</option>
+                                        <option value="custom">Custom...</option>
+                                    </select>
+                                    <input type="text" id="custom-object" class="hidden w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base mt-2" placeholder="Enter custom object...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="activity-name" class="block text-sm text-light/80 mb-1">Subject Name</label>
+                            <input type="text" id="activity-name" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base" placeholder="e.g. Game of Thrones, Guitar Practice, etc.">
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <label for="activity-target-type" class="block text-sm text-light/80 mb-1">Target Type</label>
+                                <select id="activity-target-type" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base">
+                                    <option value="at-least">At least</option>
+                                    <option value="range">Range</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-span-1">
+                                <label for="activity-target-min" class="block text-sm text-light/80 mb-1">Min Value</label>
+                                <input type="number" id="activity-target-min" min="1" value="30" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base">
+                            </div>
+                            
+                            <div class="col-span-1">
+                                <label for="activity-target-max" class="block text-sm text-light/80 mb-1">Max Value</label>
+                                <input type="number" id="activity-target-max" min="1" value="60" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base" disabled>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="activity-unit" class="block text-sm text-light/80 mb-1">Unit</label>
+                                <div class="relative">
+                                    <select id="activity-unit" class="w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base">
+                                        <option value="pages">pages</option>
+                                        <option value="chapters">chapters</option>
+                                        <option value="episodes">episodes</option>
+                                        <option value="minutes">minutes</option>
+                                        <option value="hours">hours</option>
+                                        <option value="levels">levels</option>
+                                        <option value="exercises">exercises</option>
+                                        <option value="custom">Custom...</option>
+                                    </select>
+                                    <input type="text" id="custom-unit" class="hidden w-full bg-dark-300 text-light border border-accent/50 rounded py-2 px-3 text-base mt-2" placeholder="Enter custom unit...">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="activity-scale" class="block text-sm text-light/80 mb-1">
+                                    Priority Scale
+                                    <span class="tooltip ml-1">
+                                        <i class="fas fa-question-circle text-light/50"></i>
+                                        <span class="tooltip-text">Higher value = more likely to be selected as a quest</span>
+                                    </span>
+                                </label>
+                                <div class="flex items-center">
+                                    <input type="range" id="activity-scale" min="1" max="5" value="3" class="w-full bg-dark-300 accent-accent">
+                                    <span id="scale-value" class="ml-2 text-light/80 min-w-[24px]">3</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="activity-icon" class="block text-sm text-light/80 mb-1">
+                                Icon
+                            </label>
+                            <div class="flex flex-wrap gap-2 p-2 bg-dark-400 border border-accent/30 rounded max-h-[120px] overflow-y-auto">
+                                <button type="button" data-icon="📚" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">📚</button>
+                                <button type="button" data-icon="🎮" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🎮</button>
+                                <button type="button" data-icon="🎬" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🎬</button>
+                                <button type="button" data-icon="📺" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">📺</button>
+                                <button type="button" data-icon="🎧" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🎧</button>
+                                <button type="button" data-icon="🎨" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🎨</button>
+                                <button type="button" data-icon="🏋️" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🏋️</button>
+                                <button type="button" data-icon="🧘" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🧘</button>
+                                <button type="button" data-icon="🎯" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🎯</button>
+                                <button type="button" data-icon="💼" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">💼</button>
+                                <button type="button" data-icon="🧪" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🧪</button>
+                                <button type="button" data-icon="🎼" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🎼</button>
+                                <button type="button" data-icon="🧹" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🧹</button>
+                                <button type="button" data-icon="🧠" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🧠</button>
+                                <button type="button" data-icon="🍳" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">🍳</button>
+                                <button type="button" data-icon="✍️" class="icon-btn w-8 h-8 flex items-center justify-center bg-dark-300 hover:bg-accent/20 rounded transition-colors">✍️</button>
+                            </div>
+                            <input type="hidden" id="selected-icon" value="📚">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-2 pt-2">
+                            <button type="button" id="cancel-activity" class="bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-4 py-2 rounded font-medium transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" id="save-activity" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-4 py-2 rounded font-semibold transition-colors">
+                                Save Activity
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Activity List -->
+                <div id="activity-list-container" class="lg:col-span-2 bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl cinzel font-semibold">Your Activities</h3>
+                        
+                        <div class="flex">
+                            <button id="select-all-btn" class="bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-3 py-1 rounded text-sm mr-2 transition-colors">
+                                <i class="fas fa-check-square mr-1"></i> Select All
+                            </button>
+                            <button id="delete-selected-btn" disabled class="bg-red-900/40 hover:bg-red-800/60 text-light/50 cursor-not-allowed border border-red-900/30 px-3 py-1 rounded text-sm transition-colors">
+                                <i class="fas fa-trash mr-1"></i> Delete Selected
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="activity-list" class="activity-list-container">
+                        <div id="empty-activity-list" class="text-center py-12">
+                            <i class="fas fa-list-check text-4xl text-light/20 mb-3"></i>
+                            <p class="text-light/50">No activities added yet</p>
+                            <p class="text-light/30 text-sm mt-1">Click "Add New Activity" to get started</p>
+                        </div>
+                        
+                        <!-- Activities will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Tab -->
+        <div id="stats-tab" class="tab-content">
+            <h2 class="text-2xl cinzel font-semibold mb-6">Your Stats & Progress</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <h3 class="text-xl cinzel font-semibold mb-3">Total Quests Completed</h3>
+                    <div class="flex items-end">
+                        <span id="total-quests" class="text-4xl font-bold text-accent">0</span>
+                        <span class="text-light/50 ml-2 mb-1">quests</span>
+                    </div>
+                </div>
+                
+                <div class="bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <h3 class="text-xl cinzel font-semibold mb-3">Quest Generation Count</h3>
+                    <div class="flex items-end">
+                        <span id="generation-count" class="text-4xl font-bold text-accent">0</span>
+                        <span class="text-light/50 ml-2 mb-1">generations</span>
+                    </div>
+                </div>
+                
+                <div class="bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <h3 class="text-xl cinzel font-semibold mb-3">Highest Daily Streak</h3>
+                    <div class="flex items-end">
+                        <span id="highest-streak" class="text-4xl font-bold text-accent">0</span>
+                        <span class="text-light/50 ml-2 mb-1">days</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <h3 class="text-xl cinzel font-semibold mb-4">Completion by Category</h3>
+                    <div id="category-stats" class="space-y-3">
+                        <!-- Category stats will be dynamically added here -->
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-2">📚</span>
+                                <span>Reading</span>
+                            </div>
+                            <span class="font-bold text-accent">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-dark-500 border border-accent/30 rounded-lg p-4 shadow-lg">
+                    <h3 class="text-xl cinzel font-semibold mb-4">Game Data</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <button id="export-data" class="bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-4 py-2 rounded font-medium transition-colors">
+                            <i class="fas fa-file-export mr-1"></i> Export Game Data
+                        </button>
+                        
+                        <button id="import-data" class="bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-4 py-2 rounded font-medium transition-colors">
+                            <i class="fas fa-file-import mr-1"></i> Import Game Data
+                        </button>
+                        
+                        <button id="hard-reset" class="bg-red-900/40 hover:bg-red-800/60 text-light/80 border border-red-900/30 px-4 py-2 rounded font-medium transition-colors">
+                            <i class="fas fa-trash-alt mr-1"></i> Hard Reset
+                        </button>
+                    </div>
+                    
+                    <div id="import-container" class="hidden mt-4">
+                        <textarea id="import-text" class="w-full bg-dark-300 text-light border border-accent/50 rounded p-2 text-sm" rows="4" placeholder="Paste your exported game data here..."></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button id="confirm-import" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-3 py-1 rounded text-sm transition-colors">
+                                Confirm Import
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="export-container" class="hidden mt-4">
+                        <p class="text-light/70 text-sm mb-2">Copy this text to save your game data:</p>
+                        <textarea id="export-text" class="w-full bg-dark-300 text-light border border-accent/50 rounded p-2 text-sm" rows="4" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="mt-8 py-4 px-4 sm:px-6 border-t border-accent/30 bg-dark-400 text-light/50 text-sm">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <p>© 2025 Questify - A RPG-styled Activity Picker</p>
+                <p>Developed by <a href="https://ko-fi.com/cygryu" target="_blank" class="text-accent hover:text-accent/80 transition-colors">CygRyu</a></p>
+            </div>
+            <div class="mt-2 md:mt-0 flex items-center space-x-4">
+                <a href="https://ko-fi.com/cygryu" target="_blank" class="text-light/60 hover:text-accent transition-colors">
+                    <i class="fas fa-mug-hot mr-1"></i> Ko-Fi
+                </a>
+                <a href="https://www.paypal.com/paypalme/sofiansu?country.x=ID&locale.x=en_US" target="_blank" class="text-light/60 hover:text-accent transition-colors">
+                    <i class="fab fa-paypal mr-1"></i> PayPal
+                </a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay hidden">
+        <div class="tutorial-content">
+            <h2 class="text-2xl cinzel font-bold mb-4 text-accent">Welcome to Questify!</h2>
+            <p class="mb-4">Questify helps you overcome choice paralysis and conquer procrastination by turning your activities into RPG-style quests.</p>
+            
+            <ol class="space-y-3 mb-6">
+                <li class="flex">
+                    <span class="bg-accent/30 text-accent font-bold rounded-full w-6 h-6 flex items-center justify-center mr-2">1</span>
+                    <div>
+                        <p class="font-semibold">Add activities</p>
+                        <p class="text-light/70 text-sm">Create a list of activities you want to do with details like type, target amount, and priority.</p>
+                    </div>
+                </li>
+                <li class="flex">
+                    <span class="bg-accent/30 text-accent font-bold rounded-full w-6 h-6 flex items-center justify-center mr-2">2</span>
+                    <div>
+                        <p class="font-semibold">Generate quests</p>
+                        <p class="text-light/70 text-sm">Let Questify randomly select activities for you based on your priorities.</p>
+                    </div>
+                </li>
+                <li class="flex">
+                    <span class="bg-accent/30 text-accent font-bold rounded-full w-6 h-6 flex items-center justify-center mr-2">3</span>
+                    <div>
+                        <p class="font-semibold">Complete quests</p>
+                        <p class="text-light/70 text-sm">Finish your quests to earn Stamina and track your progress.</p>
+                    </div>
+                </li>
+            </ol>
+            
+            <p class="text-accent mb-4">Mind the Stamina system! Each quest generation costs Stamina, which you regain by completing quests.</p>
+            
+            <div class="flex justify-center">
+                <button id="tutorial-close" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-6 py-2 rounded font-semibold transition-colors">
+                    Begin Your Journey
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="tutorial-overlay hidden">
+        <div class="tutorial-content overflow-y-auto max-h-[80vh]">
+            <h2 class="text-2xl cinzel font-bold mb-4 text-accent">Questify Help Guide</h2>
+            
+            <div class="space-y-4 mb-4">
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Activities</h3>
+                    <p class="text-light/70 mb-2">Create and manage your list of activities with these attributes:</p>
+                    <ul class="list-disc pl-5 text-sm space-y-1 text-light/70">
+                        <li><strong>Type:</strong> The action to perform (Read, Play, Watch, etc.)</li>
+                        <li><strong>Object:</strong> What you're interacting with (Book, Game, Movie, etc.)</li>
+                        <li><strong>Subject:</strong> Specific name of the activity (Game of Thrones, Guitar Practice)</li>
+                        <li><strong>Target:</strong> Amount to complete (at least X or range X-Y)</li>
+                        <li><strong>Unit:</strong> Measurement unit (pages, minutes, episodes, etc.)</li>
+                        <li><strong>Scale:</strong> Priority level (1-5) affecting selection probability</li>
+                        <li><strong>Icon:</strong> Visual indicator for quick recognition</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Quest Generation</h3>
+                    <p class="text-light/70 mb-2">How quest generation works:</p>
+                    <ul class="list-disc pl-5 text-sm space-y-1 text-light/70">
+                        <li>Select how many quests to generate (2-10)</li>
+                        <li>Higher priority activities (Scale 5) are 5x more likely to be selected than lower ones (Scale 1)</li>
+                        <li>Recently completed activities have a lower chance of being selected again</li>
+                        <li>System tries to avoid duplicates when possible</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Stamina System</h3>
+                    <p class="text-light/70 mb-2">Managing your Stamina:</p>
+                    <ul class="list-disc pl-5 text-sm space-y-1 text-light/70">
+                        <li>Start with 5 Stamina (❤️) points</li>
+                        <li>Generating quests costs 1 Stamina</li>
+                        <li>Complete a quest to restore +1 Stamina</li>
+                        <li>Gain +2 Stamina at midnight (daily reset)</li>
+                        <li>When Stamina reaches 0, you can't generate new quests until you complete some</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Hollowing Mechanic</h3>
+                    <p class="text-light/70 mb-2">Consequences of deleting too many quests:</p>
+                    <ul class="list-disc pl-5 text-sm space-y-1 text-light/70">
+                        <li>Deleting 3+ quests in a day causes "Hollowing"</li>
+                        <li>While Hollow, quest generation costs 2 Stamina instead of 1</li>
+                        <li>Priority scaling is reduced for high-scale activities</li>
+                        <li>Complete 3 quests without deleting any to reverse Hollowing</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">Data Management</h3>
+                    <p class="text-light/70 mb-2">Saving and loading your progress:</p>
+                    <ul class="list-disc pl-5 text-sm space-y-1 text-light/70">
+                        <li>All data is automatically saved to your browser's local storage</li>
+                        <li>Export your data as text to save it elsewhere or transfer between devices</li>
+                        <li>Import previously exported data to restore your activities and progress</li>
+                        <li>Hard Reset will completely wipe all data and start fresh</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <button id="help-close" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-6 py-2 rounded font-semibold transition-colors">
+                    Close Help
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="tutorial-overlay hidden">
+        <div class="tutorial-content">
+            <h2 class="text-xl cinzel font-bold mb-4 text-accent" id="confirm-title">Confirm Action</h2>
+            <p id="confirm-message" class="mb-6">Are you sure you want to proceed?</p>
+            
+            <div class="flex justify-end space-x-3">
+                <button id="confirm-cancel" class="bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-4 py-2 rounded font-medium transition-colors">
+                    Cancel
+                </button>
+                <button id="confirm-ok" class="bg-accent hover:bg-accent/80 text-light border border-accent/50 px-4 py-2 rounded font-semibold transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /////////////////////////////////////////////
+        // Main application class
+        /////////////////////////////////////////////
+        class Questify {
+            constructor() {
+                // Activity and quest storage
+                this.activities = [];
+                this.quests = [];
+                this.nextId = 1;
+                
+                // Stats
+                this.stats = {
+                    totalQuestsCompleted: 0,
+                    generationCount: 0,
+                    highestStreak: 0,
+                    categoryCompletions: {},
+                    lastDayCompleted: null,
+                    currentStreak: 0,
+                    completedToday: 0,
+                    totalToday: 0,
+                    lastReset: new Date().toDateString()
+                };
+                
+                // Stamina system
+                this.stamina = 5;
+                this.maxStamina = 5;
+                this.isHollow = false;
+                this.hollowingQuests = 0;
+                this.questsDeletionCount = 0;
+                
+                // UI elements
+                this.elements = {
+                    questContainer: document.getElementById('quest-container'),
+                    activityList: document.getElementById('activity-list'),
+                    emptyQuestPrompt: document.getElementById('empty-quest-prompt'),
+                    emptyActivityList: document.getElementById('empty-activity-list'),
+                    activityForm: document.getElementById('activity-form'),
+                    activityFormContainer: document.getElementById('activity-form-container'),
+                    questCount: document.getElementById('quest-count'),
+                    generateQuests: document.getElementById('generate-quests'),
+                    generateCounter: document.getElementById('generate-counter'),
+                    questWarning: document.getElementById('quest-warning'),
+                    warningMessage: document.getElementById('warning-message'),
+                    staminaDisplay: document.getElementById('stamina-display'),
+                    staminaInfo: document.getElementById('stamina-info'),
+                    tabButtons: document.querySelectorAll('.tab-btn'),
+                    tabContents: document.querySelectorAll('.tab-content'),
+                    tutorialOverlay: document.getElementById('tutorial-overlay'),
+                    tutorialClose: document.getElementById('tutorial-close'),
+                    helpBtn: document.getElementById('help-btn'),
+                    helpModal: document.getElementById('help-modal'),
+                    helpClose: document.getElementById('help-close'),
+                    confirmModal: document.getElementById('confirm-modal'),
+                    confirmTitle: document.getElementById('confirm-title'),
+                    confirmMessage: document.getElementById('confirm-message'),
+                    confirmOk: document.getElementById('confirm-ok'),
+                    confirmCancel: document.getElementById('confirm-cancel'),
+                    addActivityBtn: document.getElementById('add-activity-btn'),
+                    cancelActivity: document.getElementById('cancel-activity'),
+                    activityTypeSelect: document.getElementById('activity-type'),
+                    customType: document.getElementById('custom-type'),
+                    activityObjectSelect: document.getElementById('activity-object'),
+                    customObject: document.getElementById('custom-object'),
+                    activityUnitSelect: document.getElementById('activity-unit'),
+                    customUnit: document.getElementById('custom-unit'),
+                    activityTargetType: document.getElementById('activity-target-type'),
+                    activityTargetMin: document.getElementById('activity-target-min'),
+                    activityTargetMax: document.getElementById('activity-target-max'),
+                    activityScale: document.getElementById('activity-scale'),
+                    scaleValue: document.getElementById('scale-value'),
+                    iconButtons: document.querySelectorAll('.icon-btn'),
+                    selectedIcon: document.getElementById('selected-icon'),
+                    questsCompletedToday: document.getElementById('quests-completed-today'),
+                    questsTotalToday: document.getElementById('quests-total-today'),
+                    dailyProgressBar: document.getElementById('daily-progress-bar'),
+                    selectAllBtn: document.getElementById('select-all-btn'),
+                    deleteSelectedBtn: document.getElementById('delete-selected-btn'),
+                    totalQuestsElement: document.getElementById('total-quests'),
+                    generationCountElement: document.getElementById('generation-count'),
+                    highestStreakElement: document.getElementById('highest-streak'),
+                    categoryStatsElement: document.getElementById('category-stats'),
+                    exportDataBtn: document.getElementById('export-data'),
+                    importDataBtn: document.getElementById('import-data'),
+                    exportContainer: document.getElementById('export-container'),
+                    importContainer: document.getElementById('import-container'),
+                    exportText: document.getElementById('export-text'),
+                    importText: document.getElementById('import-text'),
+                    confirmImport: document.getElementById('confirm-import'),
+                    emptyAddActivityBtn: document.getElementById('empty-add-activity-btn'),
+                    hollowWarning: document.getElementById('hollow-warning'),
+                    hardResetBtn: document.getElementById('hard-reset')
+                };
+                
+                // Initialize the application
+                this.init();
+            }
+            
+            init() {
+                // Load saved data
+                this.loadFromStorage();
+                
+                // Check for day change and reset daily stats if needed
+                this.checkDayChange();
+                
+                // Set up event listeners
+                this.setupEventListeners();
+                
+                // Render UI
+                this.updateStaminaDisplay();
+                this.updateQuestBoard();
+                this.updateActivityList();
+                this.updateStats();
+                
+                // Show tutorial on first visit
+                if (!localStorage.getItem('questifyTutorialSeen')) {
+                    this.elements.tutorialOverlay.classList.remove('hidden');
+                    localStorage.setItem('questifyTutorialSeen', 'true');
+                }
+                
+                // Set dark mode based on user preference
+                this.setupDarkMode();
+                
+                // Set up form validation
+                this.setupFormValidation();
+            }
+            
+            setupDarkMode() {
+                // Default to dark mode since the UI is designed for it
+                document.documentElement.classList.add('dark');
+                
+                // Listen for system preference changes
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                    if (event.matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        // Still keep dark mode for this app even if system changes to light
+                        document.documentElement.classList.add('dark');
+                    }
+                });
+            }
+            
+            setupEventListeners() {
+                // Tab navigation
+                this.elements.tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        this.elements.tabButtons.forEach(btn => btn.classList.remove('active', 'border-accent'));
+                        button.classList.add('active', 'border-accent');
+                        
+                        const tab = button.getAttribute('data-tab');
+                        this.elements.tabContents.forEach(content => content.classList.remove('active'));
+                        document.getElementById(`${tab}-tab`).classList.add('active');
+                    });
+                });
+                
+                // Activity form related
+                this.elements.addActivityBtn.addEventListener('click', () => this.showActivityForm());
+                this.elements.emptyAddActivityBtn.addEventListener('click', () => {
+                    this.elements.tabButtons.forEach(btn => btn.classList.remove('active', 'border-accent'));
+                    document.querySelector('[data-tab="activities"]').classList.add('active', 'border-accent');
+                    
+                    this.elements.tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById('activities-tab').classList.add('active');
+                    
+                    this.showActivityForm();
+                });
+                
+                this.elements.cancelActivity.addEventListener('click', () => this.hideActivityForm());
+                
+                this.elements.activityForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveActivity();
+                });
+                
+                // Custom dropdowns
+                this.elements.activityTypeSelect.addEventListener('change', () => {
+                    if (this.elements.activityTypeSelect.value === 'custom') {
+                        this.elements.customType.classList.remove('hidden');
+                    } else {
+                        this.elements.customType.classList.add('hidden');
+                    }
+                });
+                
+                this.elements.activityObjectSelect.addEventListener('change', () => {
+                    if (this.elements.activityObjectSelect.value === 'custom') {
+                        this.elements.customObject.classList.remove('hidden');
+                    } else {
+                        this.elements.customObject.classList.add('hidden');
+                    }
+                });
+                
+                this.elements.activityUnitSelect.addEventListener('change', () => {
+                    if (this.elements.activityUnitSelect.value === 'custom') {
+                        this.elements.customUnit.classList.remove('hidden');
+                    } else {
+                        this.elements.customUnit.classList.add('hidden');
+                    }
+                });
+                
+                // Target type change
+                this.elements.activityTargetType.addEventListener('change', () => {
+                    if (this.elements.activityTargetType.value === 'range') {
+                        this.elements.activityTargetMax.removeAttribute('disabled');
+                    } else {
+                        this.elements.activityTargetMax.setAttribute('disabled', 'disabled');
+                    }
+                });
+                
+                // Scale display
+                this.elements.activityScale.addEventListener('input', () => {
+                    this.elements.scaleValue.textContent = this.elements.activityScale.value;
+                });
+                
+                // Icon selection
+                this.elements.iconButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        this.elements.iconButtons.forEach(btn => btn.classList.remove('bg-accent/40'));
+                        button.classList.add('bg-accent/40');
+                        this.elements.selectedIcon.value = button.getAttribute('data-icon');
+                    });
+                });
+                
+                // Generate quests
+                this.elements.generateQuests.addEventListener('click', () => this.generateQuests());
+                
+                // Delete selected activities
+                this.elements.selectAllBtn.addEventListener('click', () => this.toggleSelectAll());
+                this.elements.deleteSelectedBtn.addEventListener('click', () => this.showDeleteSelectedConfirmation());
+                
+                // Tutorial and help
+                this.elements.tutorialClose.addEventListener('click', () => {
+                    this.elements.tutorialOverlay.classList.add('hidden');
+                });
+                
+                this.elements.helpBtn.addEventListener('click', () => {
+                    this.elements.helpModal.classList.remove('hidden');
+                });
+                
+                this.elements.helpClose.addEventListener('click', () => {
+                    this.elements.helpModal.classList.add('hidden');
+                });
+                
+                // Confirmation dialog
+                this.elements.confirmCancel.addEventListener('click', () => {
+                    this.elements.confirmModal.classList.add('hidden');
+                });
+                
+                // Export/Import
+                this.elements.exportDataBtn.addEventListener('click', () => {
+                    this.elements.importContainer.classList.add('hidden');
+                    this.elements.exportContainer.classList.remove('hidden');
+                    this.exportGameData();
+                });
+                
+                this.elements.importDataBtn.addEventListener('click', () => {
+                    this.elements.exportContainer.classList.add('hidden');
+                    this.elements.importContainer.classList.remove('hidden');
+                });
+                
+                this.elements.confirmImport.addEventListener('click', () => {
+                    this.importGameData();
+                });
+                
+                // Hard Reset Button
+                this.elements.hardResetBtn.addEventListener('click', () => {
+                    this.showHardResetConfirmation();
+                });
+            }
+            
+            setupFormValidation() {
+                const activityName = document.getElementById('activity-name');
+                const saveButton = document.getElementById('save-activity');
+                
+                const validateForm = () => {
+                    // Only enable the save button if the activity name is filled
+                    if (activityName.value.trim()) {
+                        saveButton.removeAttribute('disabled');
+                        saveButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        saveButton.setAttribute('disabled', 'disabled');
+                        saveButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                };
+                
+                activityName.addEventListener('input', validateForm);
+                
+                // Initially validate
+                validateForm();
+            }
+            
+            showActivityForm(activity = null) {
+                // Reset form
+                this.elements.activityForm.reset();
+                
+                // Reset custom fields
+                this.elements.customType.classList.add('hidden');
+                this.elements.customObject.classList.add('hidden');
+                this.elements.customUnit.classList.add('hidden');
+                
+                // Reset icon selection
+                this.elements.iconButtons.forEach(btn => btn.classList.remove('bg-accent/40'));
+                this.elements.iconButtons[0].classList.add('bg-accent/40');
+                this.elements.selectedIcon.value = '📚';
+                
+                // Set default scale value display
+                this.elements.scaleValue.textContent = '3';
+                
+                // If editing existing activity
+                if (activity) {
+                    document.getElementById('form-title').textContent = 'Edit Activity';
+                    document.getElementById('activity-id').value = activity.id;
+                    
+                    // Set type
+                    if (this.elements.activityTypeSelect.querySelector(`option[value="${activity.type}"]`)) {
+                        this.elements.activityTypeSelect.value = activity.type;
+                    } else {
+                        this.elements.activityTypeSelect.value = 'custom';
+                        this.elements.customType.value = activity.type;
+                        this.elements.customType.classList.remove('hidden');
+                    }
+                    
+                    // Set object
+                    if (this.elements.activityObjectSelect.querySelector(`option[value="${activity.object}"]`)) {
+                        this.elements.activityObjectSelect.value = activity.object;
+                    } else {
+                        this.elements.activityObjectSelect.value = 'custom';
+                        this.elements.customObject.value = activity.object;
+                        this.elements.customObject.classList.remove('hidden');
+                    }
+                    
+                    // Set name
+                    document.getElementById('activity-name').value = activity.name;
+                    
+                    // Set target
+                    this.elements.activityTargetType.value = activity.targetType;
+                    this.elements.activityTargetMin.value = activity.targetMin;
+                    
+                    if (activity.targetType === 'range') {
+                        this.elements.activityTargetMax.value = activity.targetMax;
+                        this.elements.activityTargetMax.removeAttribute('disabled');
+                    } else {
+                        this.elements.activityTargetMax.setAttribute('disabled', 'disabled');
+                    }
+                    
+                    // Set unit
+                    if (this.elements.activityUnitSelect.querySelector(`option[value="${activity.unit}"]`)) {
+                        this.elements.activityUnitSelect.value = activity.unit;
+                    } else {
+                        this.elements.activityUnitSelect.value = 'custom';
+                        this.elements.customUnit.value = activity.unit;
+                        this.elements.customUnit.classList.remove('hidden');
+                    }
+                    
+                    // Set scale
+                    this.elements.activityScale.value = activity.scale;
+                    this.elements.scaleValue.textContent = activity.scale;
+                    
+                    // Set icon
+                    this.elements.selectedIcon.value = activity.icon;
+                    const iconBtn = Array.from(this.elements.iconButtons).find(btn => 
+                        btn.getAttribute('data-icon') === activity.icon
+                    );
+                    
+                    if (iconBtn) {
+                        this.elements.iconButtons.forEach(btn => btn.classList.remove('bg-accent/40'));
+                        iconBtn.classList.add('bg-accent/40');
+                    }
+                } else {
+                    document.getElementById('form-title').textContent = 'Add New Activity';
+                    document.getElementById('activity-id').value = '';
+                }
+                
+                // Show form
+                this.elements.activityFormContainer.classList.remove('hidden');
+            }
+            
+            hideActivityForm() {
+                this.elements.activityFormContainer.classList.add('hidden');
+            }
+            
+            saveActivity() {
+                // Get form values
+                const id = document.getElementById('activity-id').value;
+                let type, object, unit;
+                
+                // Handle custom type
+                if (this.elements.activityTypeSelect.value === 'custom') {
+                    type = this.elements.customType.value.trim();
+                } else {
+                    type = this.elements.activityTypeSelect.value;
+                }
+                
+                // Handle custom object
+                if (this.elements.activityObjectSelect.value === 'custom') {
+                    object = this.elements.customObject.value.trim();
+                } else {
+                    object = this.elements.activityObjectSelect.value;
+                }
+                
+                // Handle custom unit
+                if (this.elements.activityUnitSelect.value === 'custom') {
+                    unit = this.elements.customUnit.value.trim();
+                } else {
+                    unit = this.elements.activityUnitSelect.value;
+                }
+                
+                const name = document.getElementById('activity-name').value.trim();
+                if (!name) {
+                    alert('Activity name cannot be empty');
+                    return;
+                }
+                
+                const targetType = this.elements.activityTargetType.value;
+                const targetMin = parseInt(this.elements.activityTargetMin.value);
+                const targetMax = targetType === 'range' ? parseInt(this.elements.activityTargetMax.value) : targetMin;
+                const scale = parseInt(this.elements.activityScale.value);
+                const icon = this.elements.selectedIcon.value;
+                
+                const activity = {
+                    type,
+                    object,
+                    name,
+                    targetType,
+                    targetMin,
+                    targetMax,
+                    unit,
+                    scale,
+                    icon,
+                    lastCompleted: null
+                };
+                
+                // Add or update activity
+                if (id) {
+                    // Update existing activity
+                    const index = this.activities.findIndex(a => a.id === parseInt(id));
+                    if (index !== -1) {
+                        activity.id = parseInt(id);
+                        activity.lastCompleted = this.activities[index].lastCompleted;
+                        this.activities[index] = activity;
+                    }
+                } else {
+                    // Add new activity
+                    activity.id = this.nextId++;
+                    this.activities.push(activity);
+                }
+                
+                // Save to storage
+                this.saveToStorage();
+                
+                // Update activity list
+                this.updateActivityList();
+                
+                // Hide form
+                this.hideActivityForm();
+            }
+            
+            toggleSelectAll() {
+                const checkboxes = document.querySelectorAll('.activity-checkbox');
+                const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+                
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = !allChecked;
+                });
+                
+                this.updateDeleteSelectedButton();
+            }
+            
+            updateDeleteSelectedButton() {
+                const checkboxes = document.querySelectorAll('.activity-checkbox');
+                const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+                
+                if (checkedCount > 0) {
+                    this.elements.deleteSelectedBtn.removeAttribute('disabled');
+                    this.elements.deleteSelectedBtn.classList.remove('text-light/50', 'cursor-not-allowed', 'bg-red-900/40');
+                    this.elements.deleteSelectedBtn.classList.add('text-light', 'bg-red-900/80', 'hover:bg-red-800');
+                } else {
+                    this.elements.deleteSelectedBtn.setAttribute('disabled', 'disabled');
+                    this.elements.deleteSelectedBtn.classList.add('text-light/50', 'cursor-not-allowed', 'bg-red-900/40');
+                    this.elements.deleteSelectedBtn.classList.remove('text-light', 'bg-red-900/80', 'hover:bg-red-800');
+                }
+            }
+            
+            showDeleteSelectedConfirmation() {
+                const checkboxes = document.querySelectorAll('.activity-checkbox:checked');
+                const count = checkboxes.length;
+                
+                if (count === 0) return;
+                
+                this.elements.confirmTitle.textContent = 'Delete Activities';
+                this.elements.confirmMessage.textContent = `Are you sure you want to delete ${count} selected ${count === 1 ? 'activity' : 'activities'}?`;
+                
+                this.elements.confirmOk.onclick = () => {
+                    const idsToDelete = Array.from(checkboxes).map(checkbox => 
+                        parseInt(checkbox.getAttribute('data-id'))
+                    );
+                    
+                    this.activities = this.activities.filter(activity => 
+                        !idsToDelete.includes(activity.id)
+                    );
+                    
+                    // Also remove any quests for deleted activities
+                    this.quests = this.quests.filter(quest => 
+                        !idsToDelete.includes(quest.activityId)
+                    );
+                    
+                    this.saveToStorage();
+                    this.updateActivityList();
+                    this.updateQuestBoard();
+                    
+                    this.elements.confirmModal.classList.add('hidden');
+                };
+                
+                this.elements.confirmModal.classList.remove('hidden');
+            }
+            
+            updateActivityList() {
+                const activityList = this.elements.activityList;
+                
+                // Clear current list
+                activityList.innerHTML = '';
+                
+                // Show/hide empty state
+                if (this.activities.length === 0) {
+                    this.elements.emptyActivityList.classList.remove('hidden');
+                } else {
+                    this.elements.emptyActivityList.classList.add('hidden');
+                    
+                    // Create activity items
+                    this.activities.forEach(activity => {
+                        const activityItem = document.createElement('div');
+                        activityItem.className = 'bg-dark-400 border border-accent/30 rounded-lg p-3 mb-2 relative';
+                        
+                        // Create scale indicator
+                        let scaleHtml = '<div class="scale-indicator absolute top-3 right-3">';
+                        for (let i = 1; i <= 5; i++) {
+                            scaleHtml += `<div class="${i <= activity.scale ? 'active' : ''}"></div>`;
+                        }
+                        scaleHtml += '</div>';
+                        
+                        // Create target text
+                        let targetText = '';
+                        if (activity.targetType === 'at-least') {
+                            targetText = `at least ${activity.targetMin} ${activity.unit}`;
+                        } else {
+                            targetText = `${activity.targetMin} to ${activity.targetMax} ${activity.unit}`;
+                        }
+                        
+                        activityItem.innerHTML = `
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mt-0.5">
+                                    <input type="checkbox" class="activity-checkbox" data-id="${activity.id}">
+                                </div>
+                                <div class="ml-3 flex-grow">
+                                    <div class="flex items-center mb-1">
+                                        <span class="text-2xl mr-2">${activity.icon}</span>
+                                        <h4 class="text-lg font-semibold">${activity.name}</h4>
+                                    </div>
+                                    <p class="text-light/70 text-sm">
+                                        ${activity.type} ${activity.object}, ${targetText}
+                                    </p>
+                                </div>
+                                ${scaleHtml}
+                            </div>
+                            <div class="flex justify-end mt-2 space-x-2">
+                                <button class="edit-activity-btn bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-2 py-1 rounded text-sm transition-colors" data-id="${activity.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="delete-activity-btn bg-red-900/40 hover:bg-red-800/60 text-light/80 border border-red-900/30 px-2 py-1 rounded text-sm transition-colors" data-id="${activity.id}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        `;
+                        
+                        activityList.appendChild(activityItem);
+                        
+                        // Add event listeners to buttons
+                        const editBtn = activityItem.querySelector('.edit-activity-btn');
+                        const deleteBtn = activityItem.querySelector('.delete-activity-btn');
+                        const checkbox = activityItem.querySelector('.activity-checkbox');
+                        
+                        editBtn.addEventListener('click', () => this.editActivity(activity.id));
+                        deleteBtn.addEventListener('click', () => this.showDeleteActivityConfirmation(activity.id));
+                        checkbox.addEventListener('change', () => this.updateDeleteSelectedButton());
+                    });
+                }
+            }
+            
+            editActivity(id) {
+                const activity = this.activities.find(a => a.id === id);
+                if (activity) {
+                    this.showActivityForm(activity);
+                }
+            }
+            
+            showDeleteActivityConfirmation(id) {
+                const activity = this.activities.find(a => a.id === id);
+                
+                if (!activity) return;
+                
+                this.elements.confirmTitle.textContent = 'Delete Activity';
+                this.elements.confirmMessage.textContent = `Delete "${activity.name}"?`;
+                
+                this.elements.confirmOk.onclick = () => {
+                    this.deleteActivity(id);
+                    this.elements.confirmModal.classList.add('hidden');
+                };
+                
+                this.elements.confirmModal.classList.remove('hidden');
+            }
+            
+            deleteActivity(id) {
+                // Remove activity
+                this.activities = this.activities.filter(a => a.id !== id);
+                
+                // Remove any quests for this activity
+                this.quests = this.quests.filter(q => q.activityId !== id);
+                
+                // Save and update UI
+                this.saveToStorage();
+                this.updateActivityList();
+                this.updateQuestBoard();
+            }
+            
+            generateQuests() {
+                // Check if we have activities
+                if (this.activities.length === 0) {
+                    this.showNoActivitiesWarning();
+                    return;
+                }
+                
+                // Check stamina
+                const staminaCost = this.isHollow ? 2 : 1;
+                if (this.stamina < staminaCost) {
+                    this.showNoStaminaWarning();
+                    return;
+                }
+                
+                // Use stamina
+                this.stamina -= staminaCost;
+                this.stats.generationCount++;
+                this.updateStaminaDisplay();
+                this.saveToStorage();
+                
+                // Get desired quest count
+                const desiredCount = parseInt(this.elements.questCount.value);
+                
+                // Count empty slots
+                const currentQuestCount = this.quests.length;
+                const emptySlots = Math.max(0, desiredCount - currentQuestCount);
+                
+                if (emptySlots <= 0) {
+                    // All slots are full, show warning
+                    this.showFullQuestBoardWarning();
+                    return;
+                }
+                
+                // Check if we have enough activities to fill slots
+                if (this.activities.length < emptySlots) {
+                    // Show warning about duplicates
+                    this.elements.warningMessage.textContent = 
+                        `Only ${this.activities.length} activities available; duplicates may occur.`;
+                    this.elements.questWarning.classList.remove('hidden');
+                    
+                    // Hide warning after 5 seconds
+                    setTimeout(() => {
+                        this.elements.questWarning.classList.add('hidden');
+                    }, 5000);
+                }
+                
+                // Generate new quests
+                const newQuests = this.selectRandomActivities(emptySlots);
+                
+                // Add to quest list
+                this.quests = [...this.quests, ...newQuests];
+                
+                // Update stats
+                this.stats.totalToday += newQuests.length;
+                
+                // Save and update UI
+                this.saveToStorage();
+                this.updateQuestBoard();
+                this.updateStats();
+                
+                // Hide empty prompt if needed
+                this.elements.emptyQuestPrompt.classList.add('hidden');
+            }
+            
+            selectRandomActivities(count) {
+                const newQuests = [];
+                const availableActivities = [...this.activities];
+                
+                // Extract IDs of current quests
+                const currentQuestIds = this.quests.map(quest => quest.activityId);
+                
+                // Weighted selection algorithm
+                for (let i = 0; i < count; i++) {
+                    if (availableActivities.length === 0) break;
+                    
+                    // Calculate weights based on scale and last completion
+                    const weights = availableActivities.map(activity => {
+                        let weight = this.isHollow ? Math.min(3, activity.scale) : activity.scale;
+                        
+                        // Reduce weight if the activity was completed recently
+                        if (activity.lastCompleted) {
+                            const now = new Date();
+                            const completed = new Date(activity.lastCompleted);
+                            const hoursSince = (now - completed) / (1000 * 60 * 60);
+                            
+                            if (hoursSince < 24) {
+                                weight *= (0.5 + (hoursSince / 48)); // 50% weight immediately after completion, increasing to 100% after 24 hours
+                            }
+                        }
+                        
+                        // Reduce weight if already in quests to avoid duplicates
+                        if (currentQuestIds.includes(activity.id)) {
+                            weight *= 0.2; // 20% normal weight if already a quest
+                        }
+                        
+                        return weight;
+                    });
+                    
+                    // Calculate total weight
+                    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+                    
+                    // Select random activity based on weights
+                    let random = Math.random() * totalWeight;
+                    let selectedIndex = -1;
+                    
+                    for (let j = 0; j < weights.length; j++) {
+                        random -= weights[j];
+                        if (random <= 0) {
+                            selectedIndex = j;
+                            break;
+                        }
+                    }
+                    
+                    // If we failed to select (shouldn't happen but just in case)
+                    if (selectedIndex === -1) selectedIndex = 0;
+                    
+                    // Create quest from selected activity
+                    const activity = availableActivities[selectedIndex];
+                    
+                    // Remove selected activity from pool to avoid duplicates
+                    availableActivities.splice(selectedIndex, 1);
+                    
+                    // Generate target value
+                    let target;
+                    if (activity.targetType === 'at-least') {
+                        target = activity.targetMin;
+                    } else {
+                        // Random value in range
+                        target = Math.floor(Math.random() * (activity.targetMax - activity.targetMin + 1)) + activity.targetMin;
+                    }
+                    
+                    // Create quest object
+                    const quest = {
+                        id: Date.now() + i, // Unique ID
+                        activityId: activity.id,
+                        target,
+                        isNew: true,
+                        isRerolled: false
+                    };
+                    
+                    newQuests.push(quest);
+                }
+                
+                return newQuests;
+            }
+            
+            completeQuest(questId) {
+                // Find quest
+                const questIndex = this.quests.findIndex(q => q.id === questId);
+                
+                if (questIndex === -1) return;
+                
+                const quest = this.quests[questIndex];
+                
+                // Find activity
+                const activity = this.activities.find(a => a.id === quest.activityId);
+                
+                if (!activity) return;
+                
+                // Update activity's last completed timestamp
+                activity.lastCompleted = new Date().toISOString();
+                
+                // Remove quest
+                this.quests.splice(questIndex, 1);
+                
+                // Update stats
+                this.stats.totalQuestsCompleted++;
+                this.stats.completedToday++;
+                this.stats.lastDayCompleted = new Date().toDateString();
+                
+                // Update category stats
+                const category = activity.type;
+                if (!this.stats.categoryCompletions[category]) {
+                    this.stats.categoryCompletions[category] = 0;
+                }
+                this.stats.categoryCompletions[category]++;
+                
+                // Restore stamina
+                this.stamina = Math.min(this.maxStamina, this.stamina + 1);
+                
+                // Update hollowing counter if hollow
+                if (this.isHollow) {
+                    this.hollowingQuests++;
+                    if (this.hollowingQuests >= 3) {
+                        this.isHollow = false;
+                        this.hollowingQuests = 0;
+                        this.elements.hollowWarning.classList.add('hidden');
+                    }
+                }
+                
+                // Save and update UI
+                this.saveToStorage();
+                this.updateQuestBoard();
+                this.updateStaminaDisplay();
+                this.updateStats();
+            }
+            
+            deleteQuest(questId) {
+                // Find quest
+                const questIndex = this.quests.findIndex(q => q.id === questId);
+                
+                if (questIndex === -1) return;
+                
+                // Remove quest
+                this.quests.splice(questIndex, 1);
+                
+                // Update hollowing counter
+                this.questsDeletionCount++;
+                if (this.questsDeletionCount >= 3) {
+                    this.isHollow = true;
+                    this.hollowingQuests = 0;
+                    this.elements.hollowWarning.classList.remove('hidden');
+                }
+                
+                // Save and update UI
+                this.saveToStorage();
+                this.updateQuestBoard();
+            }
+            
+            updateQuestBoard() {
+                const questContainer = this.elements.questContainer;
+                
+                // Check if we have any quests
+                if (this.quests.length === 0) {
+                    this.elements.emptyQuestPrompt.classList.remove('hidden');
+                    questContainer.classList.add('hidden');
+                    return;
+                }
+                
+                // Show quest container and hide empty prompt
+                this.elements.emptyQuestPrompt.classList.add('hidden');
+                questContainer.classList.remove('hidden');
+                
+                // Clear current quests
+                questContainer.innerHTML = '';
+                
+                // Create quest cards
+                this.quests.forEach(quest => {
+                    const activity = this.activities.find(a => a.id === quest.activityId);
+                    
+                    if (!activity) return;
+                    
+                    const questCard = document.createElement('div');
+                    questCard.className = `quest-card rounded-lg p-4 shadow-lg relative ${quest.isNew ? 'new-quest' : ''} ${quest.isRerolled ? 'rerolled' : ''}`;
+                    quest.isNew = false; // No longer new after first render
+                    
+                    questCard.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center">
+                                <span class="text-3xl mr-2">${activity.icon}</span>
+                                <h3 class="text-xl font-semibold">${activity.name}</h3>
+                            </div>
+                            <div class="scale-indicator">
+                                ${Array(5).fill(0).map((_, i) => `<div class="${i < activity.scale ? 'active' : ''}"></div>`).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <p class="text-light/70">${activity.type} ${activity.object}</p>
+                            <p class="text-accent text-lg mt-1 font-bold">${quest.target} ${activity.unit}</p>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <button class="complete-quest-btn bg-accent hover:bg-accent/80 text-light border border-accent/50 px-3 py-1.5 rounded font-semibold transition-colors flex-grow mr-1" data-id="${quest.id}">
+                                <i class="fas fa-check mr-1"></i> Complete
+                            </button>
+                            <button class="delete-quest-btn bg-dark-300 hover:bg-dark-200 text-light/80 border border-light/20 px-3 py-1.5 rounded transition-colors" data-id="${quest.id}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    questContainer.appendChild(questCard);
+                    
+                    // Add event listeners
+                    const completeBtn = questCard.querySelector('.complete-quest-btn');
+                    const deleteBtn = questCard.querySelector('.delete-quest-btn');
+                    
+                    completeBtn.addEventListener('click', () => this.completeQuest(quest.id));
+                    deleteBtn.addEventListener('click', () => this.showDeleteQuestConfirmation(quest.id));
+                });
+                
+                this.saveToStorage();
+            }
+            
+            showDeleteQuestConfirmation(questId) {
+                const quest = this.quests.find(q => q.id === questId);
+                if (!quest) return;
+                
+                const activity = this.activities.find(a => a.id === quest.activityId);
+                if (!activity) return;
+                
+                this.elements.confirmTitle.textContent = 'Abandon Quest';
+                
+                if (this.questsDeletionCount >= 2) {
+                    this.elements.confirmMessage.innerHTML = 
+                        `<p>Are you sure you want to abandon "${activity.name}"?</p>
+                        <p class="text-red-500 mt-2"><i class="fas fa-exclamation-triangle mr-1"></i> Warning: This will be your 3rd abandoned quest. You will become Hollow!</p>`;
+                } else {
+                    this.elements.confirmMessage.textContent = `Are you sure you want to abandon "${activity.name}"?`;
+                }
+                
+                this.elements.confirmOk.onclick = () => {
+                    this.deleteQuest(questId);
+                    this.elements.confirmModal.classList.add('hidden');
+                };
+                
+                this.elements.confirmModal.classList.remove('hidden');
+            }
+            
+            updateStaminaDisplay() {
+                // Update hearts display
+                const hearts = this.elements.staminaDisplay.querySelectorAll('.stamina-heart');
+                
+                hearts.forEach((heart, index) => {
+                    if (index < this.stamina) {
+                        heart.classList.add('active');
+                        heart.classList.remove('depleted');
+                    } else {
+                        heart.classList.remove('active');
+                        heart.classList.add('depleted');
+                    }
+                });
+                
+                // Update counter in generate button
+                this.elements.generateCounter.textContent = `🔄 Left: ${this.stamina}`;
+                
+                if (this.stamina === 0) {
+                    this.elements.generateQuests.setAttribute('disabled', 'disabled');
+                    this.elements.generateQuests.classList.add('opacity-50', 'cursor-not-allowed');
+                    this.elements.staminaInfo.innerHTML = '<span class="text-red-500">Stamina:</span>';
+                    this.elements.staminaDisplay.classList.add('animate-pulse-slow');
+                } else if (this.stamina === 1) {
+                    this.elements.generateQuests.removeAttribute('disabled');
+                    this.elements.generateQuests.classList.remove('opacity-50', 'cursor-not-allowed');
+                    this.elements.staminaInfo.innerHTML = '<span class="text-amber-500">Stamina:</span>';
+                    this.elements.staminaDisplay.classList.remove('animate-pulse-slow');
+                } else {
+                    this.elements.generateQuests.removeAttribute('disabled');
+                    this.elements.generateQuests.classList.remove('opacity-50', 'cursor-not-allowed');
+                    this.elements.staminaInfo.innerHTML = '<span class="text-light">Stamina:</span>';
+                    this.elements.staminaDisplay.classList.remove('animate-pulse-slow');
+                }
+                
+                // Apply hollow effect to UI if hollow
+                if (this.isHollow) {
+                    document.body.classList.add('hollow-ui');
+                } else {
+                    document.body.classList.remove('hollow-ui');
+                }
+            }
+            
+            updateStats() {
+                // Update daily progress
+                this.elements.questsCompletedToday.textContent = this.stats.completedToday;
+                this.elements.questsTotalToday.textContent = this.stats.totalToday;
+                
+                // Update progress bar
+                let progressPercentage = 0;
+                if (this.stats.totalToday > 0) {
+                    progressPercentage = (this.stats.completedToday / this.stats.totalToday) * 100;
+                }
+                this.elements.dailyProgressBar.style.width = `${progressPercentage}%`;
+                
+                // Update stats tab
+                this.elements.totalQuestsElement.textContent = this.stats.totalQuestsCompleted;
+                this.elements.generationCountElement.textContent = this.stats.generationCount;
+                this.elements.highestStreakElement.textContent = this.stats.highestStreak;
+                
+                // Update category stats
+                this.updateCategoryStats();
+            }
+            
+            updateCategoryStats() {
+                const categoryStats = this.elements.categoryStatsElement;
+                categoryStats.innerHTML = '';
+                
+                const categories = Object.keys(this.stats.categoryCompletions);
+                
+                if (categories.length === 0) {
+                    categoryStats.innerHTML = '<p class="text-light/50 text-center py-4">No activities completed yet</p>';
+                    return;
+                }
+                
+                // Sort categories by completion count (descending)
+                categories.sort((a, b) => this.stats.categoryCompletions[b] - this.stats.categoryCompletions[a]);
+                
+                categories.forEach(category => {
+                    const count = this.stats.categoryCompletions[category];
+                    
+                    // Find icon for category
+                    let icon = '📋';
+                    const matchingActivity = this.activities.find(a => a.type === category);
+                    if (matchingActivity) {
+                        icon = matchingActivity.icon;
+                    }
+                    
+                    const categoryItem = document.createElement('div');
+                    categoryItem.className = 'flex justify-between items-center';
+                    
+                    categoryItem.innerHTML = `
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-2">${icon}</span>
+                            <span>${category}</span>
+                        </div>
+                        <span class="font-bold text-accent">${count}</span>
+                    `;
+                    
+                    categoryStats.appendChild(categoryItem);
+                });
+            }
+            
+            checkDayChange() {
+                const today = new Date().toDateString();
+                
+                if (this.stats.lastReset !== today) {
+                    // It's a new day, update stats
+                    this.stats.lastReset = today;
+                    
+                    // Reset daily completion counters
+                    this.stats.completedToday = 0;
+                    this.stats.totalToday = 0;
+                    
+                    // Reset quest deletion counter
+                    this.questsDeletionCount = 0;
+                    
+                    // Check for streaks
+                    if (this.stats.lastDayCompleted === new Date(Date.now() - 24*60*60*1000).toDateString()) {
+                        // Yesterday was completed, increment streak
+                        this.stats.currentStreak++;
+                    } else if (this.stats.lastDayCompleted !== today) {
+                        // Streak broken
+                        this.stats.currentStreak = 0;
+                    }
+                    
+                    // Update highest streak if needed
+                    if (this.stats.currentStreak > this.stats.highestStreak) {
+                        this.stats.highestStreak = this.stats.currentStreak;
+                    }
+                    
+                    // Restore some stamina at day change
+                    this.stamina = Math.min(this.maxStamina, this.stamina + 2);
+                    
+                    this.saveToStorage();
+                }
+            }
+            
+            exportGameData() {
+                // Create export object
+                const exportData = {
+                    activities: this.activities,
+                    quests: this.quests,
+                    nextId: this.nextId,
+                    stats: this.stats,
+                    stamina: this.stamina,
+                    maxStamina: this.maxStamina,
+                    isHollow: this.isHollow,
+                    hollowingQuests: this.hollowingQuests,
+                    questsDeletionCount: this.questsDeletionCount,
+                    version: '1.0.0' // Version for future compatibility
+                };
+                
+                // Convert to Base64
+                const exportString = btoa(JSON.stringify(exportData));
+                
+                // Set in textarea
+                this.elements.exportText.value = exportString;
+                
+                // Create temp text field
+                const tempInput = document.createElement('textarea');
+                tempInput.value = exportString;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                
+                // Copy to clipboard
+                try {
+                    document.execCommand('copy');
+                    // Show copied message
+                    const originalValue = this.elements.exportDataBtn.textContent;
+                    this.elements.exportDataBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied to Clipboard!';
+                    
+                    setTimeout(() => {
+                        this.elements.exportDataBtn.innerHTML = originalValue;
+                    }, 2000);
+                } catch (err) {
+                    // Just continue without copy
+                }
+                
+                document.body.removeChild(tempInput);
+            }
+            
+            importGameData() {
+                try {
+                    // Get import string
+                    const importString = this.elements.importText.value.trim();
+                    
+                    if (!importString) {
+                        throw new Error('Import data is empty');
+                    }
+                    
+                    // Parse Base64
+                    const importData = JSON.parse(atob(importString));
+                    
+                    // Validate data
+                    if (!importData.activities || !importData.quests || !importData.stats) {
+                        throw new Error('Import data is invalid');
+                    }
+                    
+                    // Load data
+                    this.activities = importData.activities;
+                    this.quests = importData.quests;
+                    this.nextId = importData.nextId;
+                    this.stats = importData.stats;
+                    this.stamina = importData.stamina;
+                    this.maxStamina = importData.maxStamina;
+                    this.isHollow = importData.isHollow;
+                    this.hollowingQuests = importData.hollowingQuests;
+                    this.questsDeletionCount = importData.questsDeletionCount;
+                    
+                    // Save and update UI
+                    this.saveToStorage();
+                    this.updateQuestBoard();
+                    this.updateActivityList();
+                    this.updateStaminaDisplay();
+                    this.updateStats();
+                    
+                    // Hide import container
+                    this.elements.importContainer.classList.add('hidden');
+                    
+                    // Show success message
+                    const originalValue = this.elements.importDataBtn.textContent;
+                    this.elements.importDataBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Import Successful!';
+                    
+                    setTimeout(() => {
+                        this.elements.importDataBtn.innerHTML = originalValue;
+                    }, 2000);
+                    
+                } catch (error) {
+                    // Show error message
+                    const originalValue = this.elements.importDataBtn.textContent;
+                    this.elements.importDataBtn.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Import Failed!';
+                    
+                    setTimeout(() => {
+                        this.elements.importDataBtn.innerHTML = originalValue;
+                    }, 2000);
+                    
+                    console.error('Import error:', error);
+                }
+            }
+            
+            showHardResetConfirmation() {
+                this.elements.confirmTitle.textContent = 'Hard Reset';
+                this.elements.confirmMessage.innerHTML = 
+                    `<p class="text-red-500 font-bold mb-2">Warning: This will erase all your data!</p>
+                     <p>Are you sure you want to reset everything and start over? This action cannot be undone.</p>`;
+                
+                this.elements.confirmOk.onclick = () => {
+                    this.hardReset();
+                    this.elements.confirmModal.classList.add('hidden');
+                };
+                
+                this.elements.confirmModal.classList.remove('hidden');
+            }
+            
+            hardReset() {
+                // Reset all data
+                this.activities = [];
+                this.quests = [];
+                this.nextId = 1;
+                
+                // Reset stats
+                this.stats = {
+                    totalQuestsCompleted: 0,
+                    generationCount: 0,
+                    highestStreak: 0,
+                    categoryCompletions: {},
+                    lastDayCompleted: null,
+                    currentStreak: 0,
+                    completedToday: 0,
+                    totalToday: 0,
+                    lastReset: new Date().toDateString()
+                };
+                
+                // Reset stamina system
+                this.stamina = 5;
+                this.maxStamina = 5;
+                this.isHollow = false;
+                this.hollowingQuests = 0;
+                this.questsDeletionCount = 0;
+                
+                // Clear localStorage
+                localStorage.removeItem('questifyData');
+                
+                // Keep tutorial seen flag so we don't show tutorial again
+                localStorage.setItem('questifyTutorialSeen', 'true');
+                
+                // Update UI
+                this.updateQuestBoard();
+                this.updateActivityList();
+                this.updateStaminaDisplay();
+                this.updateStats();
+                
+                // Hide hollow warning if visible
+                this.elements.hollowWarning.classList.add('hidden');
+                
+                // Show success message
+                const originalValue = this.elements.hardResetBtn.textContent;
+                this.elements.hardResetBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Reset Complete!';
+                
+                setTimeout(() => {
+                    this.elements.hardResetBtn.innerHTML = originalValue;
+                }, 2000);
+            }
+            
+            saveToStorage() {
+                // Save data to localStorage
+                try {
+                    localStorage.setItem('questifyData', JSON.stringify({
+                        activities: this.activities,
+                        quests: this.quests,
+                        nextId: this.nextId,
+                        stats: this.stats,
+                        stamina: this.stamina,
+                        maxStamina: this.maxStamina,
+                        isHollow: this.isHollow,
+                        hollowingQuests: this.hollowingQuests,
+                        questsDeletionCount: this.questsDeletionCount
+                    }));
+                } catch (e) {
+                    console.error('Error saving to localStorage:', e);
+                }
+            }
+            
+            loadFromStorage() {
+                // Load data from localStorage
+                try {
+                    const data = localStorage.getItem('questifyData');
+                    
+                    if (data) {
+                        const parsed = JSON.parse(data);
+                        
+                        this.activities = parsed.activities || [];
+                        this.quests = parsed.quests || [];
+                        this.nextId = parsed.nextId || 1;
+                        this.stats = parsed.stats || {
+                            totalQuestsCompleted: 0,
+                            generationCount: 0,
+                            highestStreak: 0,
+                            categoryCompletions: {},
+                            lastDayCompleted: null,
+                            currentStreak: 0,
+                            completedToday: 0,
+                            totalToday: 0,
+                            lastReset: new Date().toDateString()
+                        };
+                        this.stamina = parsed.stamina !== undefined ? parsed.stamina : 5;
+                        this.maxStamina = parsed.maxStamina || 5;
+                        this.isHollow = parsed.isHollow || false;
+                        this.hollowingQuests = parsed.hollowingQuests || 0;
+                        this.questsDeletionCount = parsed.questsDeletionCount || 0;
+                    }
+                } catch (e) {
+                    console.error('Error loading from localStorage:', e);
+                    // Initialize with defaults
+                }
+            }
+            
+            showNoActivitiesWarning() {
+                this.elements.warningMessage.textContent = 'Add activities first!';
+                this.elements.questWarning.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    this.elements.questWarning.classList.add('hidden');
+                }, 3000);
+            }
+            
+            showNoStaminaWarning() {
+                this.elements.warningMessage.textContent = 'No stamina left! Complete quests to restore stamina.';
+                this.elements.questWarning.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    this.elements.questWarning.classList.add('hidden');
+                }, 3000);
+            }
+            
+            showFullQuestBoardWarning() {
+                this.elements.warningMessage.textContent = 'Quest board is full! Complete or delete quests first.';
+                this.elements.questWarning.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    this.elements.questWarning.classList.add('hidden');
+                }, 3000);
+            }
+        }
+        
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = new Questify();
+        });
+    </script>
+</body>
+</html>
